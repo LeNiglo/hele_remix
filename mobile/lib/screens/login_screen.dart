@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:oust/helpers/hele_http_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -20,17 +21,23 @@ class LoginScreenState extends State<StatefulWidget> {
     super.initState();
   }
 
-  void _loginAsync() {
-    http.post('http://localhost:3333/v1/auth/login', body: {
-      'phone': this._phone,
-      'password': this._password
-    }).then((response) async {
-      print(response.body);
+  void _loginAsync() async {
+    try {
+      var response = await heleHttpService.loginWithPhone(_phone, _password);
+      print("--- USER id + access token ---");
+      print(response.user.id);
+      print(response.accessToken.token);
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      var res = jsonDecode(response.body);
-      await prefs.setString('jwt_token', res['access_token']['token']);
+      await prefs.setString('jwt_token', response.accessToken.token);
       Navigator.pushReplacementNamed(context, '/');
-    });
+    } catch (e) {
+      if (e is HeleApiException) {
+        print("--- ERROR DURING LOGIN ---");
+      } else {
+        print("--- NETWORK ERROR ---");
+      }
+      print(e.toString());
+    }
   }
 
   @override
@@ -66,6 +73,12 @@ class LoginScreenState extends State<StatefulWidget> {
                         _formKey.currentState.save();
                         this._loginAsync();
                       }
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text('Register'),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/register');
                     },
                   )
                 ],
