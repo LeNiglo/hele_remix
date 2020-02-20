@@ -28,6 +28,9 @@ dependencies:
   # Adonis
   adonis_websok: ^1.0.3
 
+  # Form validators https://pub.dev/packages/validators
+  validators: ^2.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,7 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:oust/helpers/hele_http_service.dart';
+import 'package:oust/responses/login_response.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -23,18 +22,19 @@ class LoginScreenState extends State<StatefulWidget> {
 
   void _loginAsync() async {
     try {
-      var response = await heleHttpService.loginWithPhone(_phone, _password);
+      var response = await heleHttpService.call<LoginResponse>('login', body: {'phone': _phone, 'password': _password});
       print("--- USER id + access token ---");
       print(response.user.id);
       print(response.accessToken.token);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('jwt_token', response.accessToken.token);
+      await prefs.setString('jwt_refresh_token', response.accessToken.refreshToken);
       Navigator.pushReplacementNamed(context, '/');
     } catch (e) {
       if (e is HeleApiException) {
         print("--- ERROR DURING LOGIN ---");
       } else {
-        print("--- NETWORK ERROR ---");
+        print("--- NETWORK OR CODE ERROR ---");
       }
       print(e.toString());
     }
@@ -56,6 +56,24 @@ class LoginScreenState extends State<StatefulWidget> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacementNamed(context, '/register');
+                    },
+                    child: Text.rich(
+                      TextSpan(
+                        text: "Vous n'avez pas de compte ? ",
+                        children: <TextSpan>[
+                          TextSpan(text: 'Enregistrez-vous', style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.lightBlue,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Colors.lightBlue,
+                          )),
+                        ],
+                      ),
+                    )
+                  ),
                   TextFormField(
                     onSaved: (value) => this._phone = value,
                     keyboardType: TextInputType.phone,
@@ -75,12 +93,6 @@ class LoginScreenState extends State<StatefulWidget> {
                       }
                     },
                   ),
-                  RaisedButton(
-                    child: Text('Register'),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/register');
-                    },
-                  )
                 ],
               )
             )
