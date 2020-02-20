@@ -59,7 +59,8 @@ class HeleHttpService {
       return responseJson;
     }
     if (statusCode == 401 || statusCode == 403) {
-      throw UnauthorizedException(res.body.toString());
+      var responseJson = json.decode(res.body.toString());
+      throw UnauthorizedException(responseJson['message'].toString());
     }
     if (statusCode >= 400 && statusCode < 500) {
       throw BadRequestException(res.body.toString());
