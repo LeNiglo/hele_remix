@@ -39,7 +39,7 @@ class LoginScreenState extends State<StatefulWidget> {
       if (e is HeleApiException) {
         print("--- ERROR DURING LOGIN ---");
         if (e is UnauthorizedException) {
-          setState(() { _state = 0; _error = "Wallah bro tu t'es gouré quelque part, réessaye"; });
+          setState(() { _state = 0; _error = "Erreur dans le N° de téléphone ou dans le mot de passe."; });
         }
       } else {
         print("--- NETWORK OR CODE ERROR ---");

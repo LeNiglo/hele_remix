@@ -8,7 +8,7 @@ const BASE_URL = "http://localhost:3333/v1";
 
 class HeleHttpService {
   // Add routes here
-  final Map<String, Map<String, String>> _routes = {
+  static const Map<String, Map<String, String>> _routes = {
     'login': {'method': 'POST', 'url': '/auth/login'},
     'register': {'method': 'POST', 'url': '/auth/register'},
   };
@@ -16,7 +16,7 @@ class HeleHttpService {
   // I did not find how to call http.get for example with 'get' in
   // the 'method' variable: http[method](...) - not working like in JS
   // So, this is a workaround.
-  final Map<String, Function> _httpHelper = {
+  static const Map<String, Function> _httpHelper = {
     'get': http.get,
     'post': http.post,
     'patch': http.patch,
@@ -27,7 +27,7 @@ class HeleHttpService {
 
   // Factories variable is a map of type:function that returns
   // an instance of the Type.
-  final Map<Type, Function> _factories = {
+  get _factories => {
     LoginResponse: (dynamic json) => LoginResponse.fromJson(json),
     RegisterResponse: (dynamic json) => RegisterResponse.fromJson(json),
   };
@@ -42,6 +42,7 @@ class HeleHttpService {
   }
 
   Future<T> call<T>(String routeName, {Map<String, String> headers, body}) async {
+    _factories[Future] = (dynamic json) => "";
     var res = await _call(routeName, body: body, headers: headers);
     dynamic jsonContent = _verifyResponse(res);
     Function factoryFunc = _factories[T];
