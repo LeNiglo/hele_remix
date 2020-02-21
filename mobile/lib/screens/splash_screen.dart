@@ -14,6 +14,7 @@ class SplashScreen extends StatelessWidget {
       } else {
         Navigator.pushReplacementNamed(context, '/login');
       }
+      //Navigator.pushReplacementNamed(context, '/login');
     });
   }
 
